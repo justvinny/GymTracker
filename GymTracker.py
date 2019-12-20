@@ -4,8 +4,29 @@ import csv
 
 tempdic = {}
 
+def readfromcsv(lifts):
+
+    with open('data.csv', 'r') as file:
+        reader = csv.DictReader(file)
+        for a in reader:
+            lifts.setdefault(a['Exercise'],
+                             {'Weight': a['Weight'], 'Sets': a['Sets'], 'Reps': a['Reps'],
+                              'AMRAP': a['AMRAP']})
+
+
+def writetocsv(lifts):
+
+    with open('data.csv', 'w') as file:
+        field = ['Exercise', 'Weight', 'Sets', 'Reps', 'AMRAP']
+        writer = csv.DictWriter(file, fieldnames=field)
+        writer.writeheader()
+
+        for a, b in lifts.items():
+            writer.writerow({'Exercise': a, 'Weight': b[field[1]], 'Sets': b[field[2]],
+                             'Reps': b[field[3]], 'AMRAP': b[field[4]]})
 
 def csvtolist():
+
     boxlist = []
 
     with open('data.csv', 'r') as file:
@@ -15,52 +36,60 @@ def csvtolist():
 
     return boxlist
 
+#FDefining our main loop
 def Main():
 
     root = tk.Tk()
     app = GymTracker(root)
     root.mainloop()
 
-
+#Class for our main tkinter app
 class GymTracker:
 
     def __init__(self, master):
+
         self.master = master
         self.config_master()
         self.frame_top()
         self.frame_bottom()
 
     def config_master(self):
+
         self.master.title('Gym Tracker')
         self.master.config(bg='black')
         self.master.geometry('400x650')
 
     #Making the top part of the frame for master
     def frame_top(self):
+
         self.frameTop = tk.Frame(self.master, bg='white')
         self.frameTop.place(relx=.1, rely=.1, relheight=.2, relwidth=.8)
 
         self.frame_top_widgets()
 
     def frame_top_widgets(self):
+
         templist = csvtolist()
-        self.readfromcsv(tempdic)
+        readfromcsv(tempdic)
 
         self.F_topTitle = tk.Label(self.frameTop, text='Gym Tracker', bg='white', font=('verdana',14,'bold'),
                                    anchor='n')
         self.F_topTitle.pack(fill=tk.X)
 
+        self.F_topLabel1 = tk.Label(self.frameTop, text=' ', bg='white')
+        self.F_topLabel1.pack()
+
         self.F_topBox = ttk.Combobox(self.frameTop, values=templist)
         self.F_topBox.current(0)
-        self.F_topBox.pack(fill=tk.X)
+        self.F_topBox.pack()
         self.F_topBox.bind('<<ComboboxSelected>>', self.callback)
 
-        self.F_topLabel = tk.Label(self.frameTop, text=' ', bg='white')
-        self.F_topLabel.pack()
+        self.F_topLabel2 = tk.Label(self.frameTop, text=' ', bg='white')
+        self.F_topLabel2.pack()
 
     def callback(self,event):
 
-        self.F_topLabel.config(text=self.F_topBox.get())
+        self.F_topLabel2.config(text='\n' + self.F_topBox.get())
 
         self.entryWeight.delete(0, 'end')
         self.entrySets.delete(0, 'end')
@@ -74,6 +103,7 @@ class GymTracker:
 
     #Making the bottom part of the frame for master
     def frame_bottom(self):
+
         self.frameBottom = tk.Frame(self.master, bg='white')
         self.frameBottom.place(relx=.1, rely=.35, relheight=.55, relwidth=.8)
         self.F_bot_widgets()
@@ -99,35 +129,14 @@ class GymTracker:
         self.entryAmrap.place(rely=.4, relx=.45, relwidth=.25, relheight=.1)
 
         self.labelStatus = tk.Label(self.frameBottom, text=' ', bg='white', width=20)
-        self.buttonUpdate = tk.Button(self.frameBottom, text='Update', command=self.updatedict)
-        self.buttonCurrent = tk.Button(self.frameBottom, text='Current', command=self.currentbox)
-        self.buttonQuit = tk.Button(self.frameBottom, text='Quit', command=self.master.destroy)
+        self.buttonUpdate = tk.Button(self.frameBottom, text='Update', command=self.updatedict, bg='slategrey')
+        self.buttonCurrent = tk.Button(self.frameBottom, text='Current', command=self.currentbox, bg='slategrey')
+        self.buttonQuit = tk.Button(self.frameBottom, text='Quit', command=self.master.destroy, bg='slategrey')
 
         self.labelStatus.place(rely=.7, relwidth=1, relheight=.1)
         self.buttonUpdate.place(rely=.8, relwidth=.5, relheight=.1)
         self.buttonCurrent.place(rely=.8, relx=.5, relwidth=.5,relheight=.1)
         self.buttonQuit.place(rely=.9, relwidth=1, relheight=.1)
-
-    def readfromcsv(self, lifts):
-
-        with open('data.csv','r') as file:
-            reader = csv.DictReader(file)
-            for a in reader:
-                lifts.setdefault(a['Exercise'],
-                                 {'Weight': a['Weight'], 'Sets': a['Sets'], 'Reps': a['Reps'],
-                                  'AMRAP': a['AMRAP']})
-
-    def writetocsv(self, lifts):
-
-        with open('data.csv','w') as file:
-
-            field = ['Exercise', 'Weight', 'Sets', 'Reps', 'AMRAP']
-            writer = csv.DictWriter(file, fieldnames=field)
-            writer.writeheader()
-
-            for a,b in lifts.items():
-                writer.writerow({'Exercise': a, 'Weight': b[field[1]], 'Sets': b[field[2]],
-                                'Reps': b[field[3]], 'AMRAP': b[field[4]]})
 
     def updatedict(self):
 
@@ -136,7 +145,7 @@ class GymTracker:
         tempdic[self.F_topBox.get()]['Reps'] = self.entryReps.get()
         tempdic[self.F_topBox.get()]['AMRAP'] = self.entryAmrap.get()
 
-        self.writetocsv(tempdic)
+        writetocsv(tempdic)
 
         self.labelStatus.configure(text=(self.F_topBox.get()+' update success!'), fg='green')
 
@@ -156,7 +165,6 @@ class GymTracker:
 
             currentboxtext += splitthem[a3] + ' \n'
 
-
         self.top = tk.Toplevel()
         self.top.geometry('400x650')
         self.top.configure(bg='black')
@@ -166,9 +174,11 @@ class GymTracker:
 
         self.toplabel = tk.Label(self.topframe, text=currentboxtext, bg='white', anchor='s')
         self.toplabel.pack(fill=tk.X)
-        self.topButton = tk.Button(self.topframe, text='Back', command=self.top.destroy)
+
+        self.topButton = tk.Button(self.topframe, text='Back', bg='slategrey', command=self.top.destroy)
         self.topButton.pack(side='bottom', fill=tk.X)
 
 
+#Initializing our app
 if __name__ == '__main__':
     Main()
