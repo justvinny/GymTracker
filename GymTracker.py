@@ -175,8 +175,8 @@ class GymTracker:
         self.toplabel1 = tk.Label(self.topframe, text='Current Stats\n', font=('Verdana', 16, 'bold'), bg='white', anchor='s')
         self.toplabel1.pack(fill=tk.X)
 
-        self.toplabel1 = tk.Label(self.topframe, text='Exercise - Weight | Sets | Reps | AMRAP\n', bg='white', anchor='s')
-        self.toplabel1.pack(fill=tk.X)
+        self.toplabel2 = tk.Label(self.topframe, text='Exercise - Weight | Sets | Reps | AMRAP\n', bg='white', anchor='s')
+        self.toplabel2.pack(fill=tk.X)
 
         self.toplabel3 = tk.Label(self.topframe, text=currentboxtext, bg='white', anchor='s')
         self.toplabel3.pack(fill=tk.X)
